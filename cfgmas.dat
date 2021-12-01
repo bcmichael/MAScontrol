@@ -1,0 +1,52 @@
+MASCMD	64
+MA	MA,0,0
+OM	OM,0,0
+GA	GA,0,0
+GM	GM,0,0
+;
+PH	PH,1,0
+CT	CT,1,0
+HG	HG,0,0
+LG	LG,0,0
+SG	SG,1,0
+TO	TO,1,0
+;
+T0	T0,0,0
+T1	T1,0,0
+T2	T2,0,0
+;
+DS	DS,1,0
+GS	GS,0,0
+V0	V0,0,0
+IN	IN,0,0
+IS	IS,0,0
+EB	EB,0,0
+ES	ES,0,0
+;
+VA	VA,0,1
+VD	VD,0,1
+;
+DP	DP,1,0
+BP	BP,1,0
+ZD	ZD,0,0
+ZB	ZB,0,0
+SB	SB,1,0
+;
+PM	PM,0,1
+PD	PD,0,1
+PB	PB,0,1
+PS	PS,0,1
+RD	RD,0,1
+RB	RB,0,1
+;
+SW	SW,0,1
+;
+AS	AS,0,5
+;
+MM	MM,1,0
+
+# This is a stripped down version of the cfgmas.dat usually used in the target
+# environment. Additional pieces of data used by RNMRA have been removed
+# leaving only the relevant MAS commands. In normal operation the cfgmas.dat
+# file is found from a directory specified by the RNMR_COMMON environment
+# variable, but if it is not set then this file will be used.
