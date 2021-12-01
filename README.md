@@ -10,7 +10,7 @@ symbols.sh and cfgmas.dat files provided here will be used. The local symbols.sh
 must be edited to contain the correct TCP information for the desired MAS
 controller for this approach to work.
 
-'''
+```
 usage: mas.py [-h] [-l LOG_DIR] [-o] [-d]
 
 optional arguments:
@@ -20,4 +20,4 @@ optional arguments:
   -o, --offline         Run offline using simple fake spinning values
   -d, --direct          Directly enter commands to interact with the MAS
                         controller with no gui
-'''
+```
