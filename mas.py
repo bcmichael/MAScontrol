@@ -1124,12 +1124,7 @@ class Configuration():
         self.locators.append(locator)
         self.intervals.append(interval)
 
-def view_gui():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-l','--log_dir', help='Set the directory to save spinning logs to', type=str)
-    parser.add_argument('-o','--offline', help='Run offline using simple fake spinning values', action='store_true')
-    args = parser.parse_args()
-
+def view_gui(args):
     config = Configuration()
 
     app = QtGui.QApplication(sys.argv)
@@ -1158,5 +1153,13 @@ def send_signals():
             print(a.send_command(command, args))
 
 if __name__=='__main__':
-    view_gui()
-    # send_signals()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l','--log_dir', help='Set the directory to save spinning logs to', type=str)
+    parser.add_argument('-o','--offline', help='Run offline using simple fake spinning values', action='store_true')
+    parser.add_argument('-d','--direct', help='Directly enter commands to interact with the MAS controller with no gui', action='store_true')
+    args = parser.parse_args()
+
+    if args.direct:
+        send_signals()
+    else:
+        view_gui(args)

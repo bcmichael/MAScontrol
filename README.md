@@ -11,11 +11,13 @@ must be edited to contain the correct TCP information for the desired MAS
 controller for this approach to work.
 
 '''
-usage: mas.py [-h] [-l LOG_DIR] [-o]
+usage: mas.py [-h] [-l LOG_DIR] [-o] [-d]
 
 optional arguments:
   -h, --help            show this help message and exit
   -l LOG_DIR, --log_dir LOG_DIR
                         Set the directory to save spinning logs to
   -o, --offline         Run offline using simple fake spinning values
+  -d, --direct          Directly enter commands to interact with the MAS
+                        controller with no gui
 '''
