@@ -33,7 +33,7 @@ class MASView(QtGui.QWidget):
     spin_digits = 5
     status = MASStatus('0','0','0','0','0')
 
-    def __init__(self, parent, config, log_dir=None):
+    def __init__(self, parent, config, log_dir=None, offline=False):
         QtGui.QWidget.__init__(self)
         self.parent = parent
         self.config = config
@@ -47,7 +47,7 @@ class MASView(QtGui.QWidget):
 
         self.build_ui()
         self.command_queue = Queue.Queue()
-        self.MASThread = MASTCPThread(self, self.command_queue)
+        self.MASThread = MASTCPThread(self, self.command_queue, offline)
         self.MASThread.start()
         self.connect(self.MASThread, QtCore.SIGNAL('got_status(PyQt_PyObject)'), self.got_status)
         self.connect(self.MASThread, QtCore.SIGNAL('reconnect(QString)'), self.reconnect_message)
@@ -734,10 +734,11 @@ class MASTCPThread(QtCore.QThread):
         parent: parent widget
         queue: command queue
     """
-    def __init__(self, parent, queue):
+    def __init__(self, parent, queue, offline):
         QtCore.QThread.__init__(self, parent)
         self.parent = parent
         self.queue = queue
+        self.offline = offline
         self.running = True
         self.retry_dialog_open = False
 
@@ -750,6 +751,10 @@ class MASTCPThread(QtCore.QThread):
         continue loop.
         """
         while self.running:
+            if self.offline is True:
+                self.run_offline()
+                continue
+
             try:
                 self.run_connection()
             except socket.timeout: # socket.timeout has to be before socket.error because it is a subtype of it
@@ -827,6 +832,24 @@ class MASTCPThread(QtCore.QThread):
                 return True
             self.msleep(100)
         return False
+
+    def run_offline(self):
+        """Generate fake spinning data for running without a MAS controller.
+
+        This function generates a very simple (and unrealistic) pattern of
+        spinning data that repeatedly ramps from 0 to 100. This fake data
+        enables development and testing of this program without needing to
+        actually connect to a MAS controller.
+        """
+        for n in range(100):
+            if self.running is False:
+                return
+            status = MASStatus(str(n),'0','0','0','0')
+            status_time = datetime.now()
+            self.emit(QtCore.SIGNAL('got_status(PyQt_PyObject)'), (status, status_time))
+            self.msleep(50)
+        self.parent.spinning_history.add_point(datetime.now(), np.ma.masked)
+        return
 
 class MASTCPHandler:
     """Manages TCP communication with an MAS controller.
@@ -1099,12 +1122,13 @@ class Configuration():
 def view_gui():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l','--log_dir', help='Set the directory to save spinning logs to', type=str)
+    parser.add_argument('-o','--offline', help='Run offline using simple fake spinning values', action='store_true')
     args = parser.parse_args()
 
     config = Configuration()
 
     app = QtGui.QApplication(sys.argv)
-    wind = MASView(app, config, args.log_dir)
+    wind = MASView(app, config, args.log_dir, args.offline)
     app.aboutToQuit.connect(wind.cleanup)
     wind.show()
     sys.exit(app.exec_())
