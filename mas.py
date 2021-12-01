@@ -751,7 +751,7 @@ class MASTCPThread(QtCore.QThread):
         continue loop.
         """
         while self.running:
-            if self.offline is True:
+            if self.offline:
                 self.run_offline()
                 continue
 
@@ -839,17 +839,22 @@ class MASTCPThread(QtCore.QThread):
         This function generates a very simple (and unrealistic) pattern of
         spinning data that repeatedly ramps from 0 to 100. This fake data
         enables development and testing of this program without needing to
-        actually connect to a MAS controller.
+        actually connect to a MAS controller. Commands in the queue are printed
+        to the terminal for debugging purposes.
         """
         for n in range(100):
             if self.running is False:
                 return
-            status = MASStatus(str(n),'0','0','0','0')
-            status_time = datetime.now()
-            self.emit(QtCore.SIGNAL('got_status(PyQt_PyObject)'), (status, status_time))
+
+            if self.queue.empty():
+                status = MASStatus(str(n),'0','0','0','0')
+                status_time = datetime.now()
+                self.emit(QtCore.SIGNAL('got_status(PyQt_PyObject)'), (status, status_time))
+            else:
+                command = self.queue.get()
+                print(command)
             self.msleep(50)
         self.parent.spinning_history.add_point(datetime.now(), np.ma.masked)
-        return
 
 class MASTCPHandler:
     """Manages TCP communication with an MAS controller.
